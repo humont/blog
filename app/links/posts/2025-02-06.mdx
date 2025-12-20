@@ -1,0 +1,19 @@
+---
+title: 'You're thinking about passkeys wrong - Yawar Amin'
+date: '2025-02-06'
+category: ['Dev', 'Authentication']
+url: 'https://dev.to/yawaramin/youre-thinking-about-passkeys-wrong-171o'
+---
+
+> ## Initial user sign-up
+> - Don't make the user set up a password!
+> - Send a magic link to their email
+> - Once they click and enter the webapp, they are in a logged-in state. Prominently show a passkey setup CTA and ask the user to set up a passkey on the device.
+> ## Subsequent logins on the same device
+> - Use Conditional UI to allow selecting the passkey directly from the Email input autocomplete. Browsers support this now!
+> - If JavaScript disabled: instead of Conditional UI and passkey login, send a magic link
+> ## Subsequent logins on a new device
+> - Send a magic link to the user's email address
+> - Once they click and enter the webapp, they are in a logged-in state. Prominently show a passkey setup CTA and ask the user to set up a passkey on the device.
+
+This is pretty clever - leverages Passkeys, only deals with the annoyance of magic email links once per device, and does away with the main problem with Passkeys: their lack of easy portability between devices/ecosystems.

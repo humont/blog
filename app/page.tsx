@@ -1,66 +1,76 @@
-import Image from "next/image";
-import styles from "./page.module.css";
-
-export default function Home() {
+export default function Page() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <article className="home">
+      <section className="intro">
+        <h1 className="greeting">Hi, I'm Hugo</h1>
+        <p className="tagline">
+          A <em>software developer</em> based in the <em>UK</em>
+        </p>
+      </section>
+
+      <section className="about">
+        <h2>About</h2>
+        <p>
+          I am currently working as a <em>full stack web developer</em>,
+          creating web apps and sites with <em>payments infrastructures</em>{' '}
+          (B2C, marketplaces, products and subscriptions).
+        </p>
+        <p>
+          My MSc focus was on <em>distributed computing</em>,{' '}
+          <em>data privacy</em> and <em>ethics</em> (yes, that's a mix of
+          technical and theoretical).
+        </p>
+        <p>
+          I spent my 20's working in the fitness industry and running my start
+          up - a high quality gourmet protein company in Hong Kong. In 2018 I
+          completed an <em>MSc in Advanced Computer Science</em>.
+        </p>
+      </section>
+
+      <section className="stack">
+        <h2>Stack</h2>
+        <dl className="stack-grid">
+          <div className="stack-category">
+            <dt>Languages</dt>
+            <dd>
+              <ul className="tag-list">
+                <li>JavaScript</li>
+                <li>TypeScript</li>
+                <li>HTML</li>
+                <li>CSS</li>
+                <li>Java</li>
+                <li>SQL</li>
+                <li>GraphQL</li>
+              </ul>
+            </dd>
+          </div>
+          <div className="stack-category">
+            <dt>Technologies</dt>
+            <dd>
+              <ul className="tag-list">
+                <li>Node</li>
+                <li>PostgreSQL</li>
+                <li>React</li>
+                <li>NextJS</li>
+                <li>Hasura</li>
+                <li>Apollo GraphQL</li>
+                <li>Dokku</li>
+                <li>Docker</li>
+              </ul>
+            </dd>
+          </div>
+          <div className="stack-category">
+            <dt>Services</dt>
+            <dd>
+              <ul className="tag-list">
+                <li>Stripe</li>
+                <li>Heroku</li>
+                <li>Netlify</li>
+              </ul>
+            </dd>
+          </div>
+        </dl>
+      </section>
+    </article>
   );
 }

@@ -1,0 +1,40 @@
+---
+title: 'Your job is to deliver code you have proven to work'
+date: '2025-12-20'
+category: ['Dev']
+url: 'https://simonwillison.net/2025/Dec/18/code-proven-to-work/'
+---
+
+> As software engineers we don’t just crank out code—in fact these days you could argue that’s what the LLMs are for. We need to deliver code that works—and we need to include proof that it works as well. Not doing that directly shifts the burden of the actual work to whoever is expected to review our code.
+
+>A computer can never be held accountable. That’s your job as the human in the loop.
+>
+>Almost anyone can prompt an LLM to generate a thousand-line patch and submit it for code review. That’s no longer valuable. What’s valuable is contributing code that is proven to work.
+
+An important post. However, one thing I'm encountering, is unmaintainable code that is proven to work. I'm not sure this is useful.
+
+A simple example:
+```javascript
+it('should multiply two numbers', () => {
+  expect(multiply(2, 3)).toBe(6);
+});
+```
+
+but what if the function is:
+```javascript
+function multiply(a, b) {
+    let realA = a * 10 * 100
+    let transformedA = realA.toString()
+
+    let realB = b * 10 * 100
+    let transformedB = realB.toString() + ', a bunch of random text and characters'
+
+    return parseInt(transformedA) * parseInt(transformedB.split(',')[0]) / 1000000
+}
+```
+
+This might be a slight exaggeration, but I've encountered code that is effectively of this nature now: redundant network requests, three db calls when one would do, etc.
+
+I guess the question is: so what? If LLMs are running the show and writing all future code, surely they can just decipher the code and build on top of it?
+
+Can they though? What happens if you have a nonsensical code base (which is proven to work), but which makes no semantic sense, that no human can understand, and weighs 100x what it should? I know context windows are increasing, and LLMs are getting better at parsing, but can they *truly* parse that?

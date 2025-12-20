@@ -143,7 +143,7 @@
   }
 
   h1 {
-    font-size: var(--text-3xl);
+    font-size: var(--text-xl);
     margin-block-start: var(--space-xl);
     text-transform: capitalize;
   }
@@ -203,16 +203,50 @@
     border-radius: 3px;
   }
 
+  /* Code blocks with syntax highlighting */
+  figure[data-rehype-pretty-code-figure] {
+    margin-block: var(--space-lg);
+
+    & pre {
+      margin: 0;
+    }
+  }
+
   pre {
     background-color: var(--color-code-bg);
     border-radius: 5px;
     padding: var(--space-md);
     overflow-x: auto;
+    margin-block: var(--space-lg);
+    position: relative;
 
     & code {
       background: none;
       padding: 0;
-      color: var(--color-code-ink);
+    }
+
+    /* Let shiki handle colors for syntax highlighted code */
+    &[data-theme] code {
+      color: inherit;
+    }
+
+    /* Language label for syntax highlighted code blocks */
+    &[data-language] {
+      padding-block-start: var(--space-lg);
+    }
+
+    &[data-language]::before {
+      content: attr(data-language);
+      position: absolute;
+      top: 0;
+      left: 0;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-ink-muted);
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: 5px 0 5px 0;
     }
   }
 

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { getPost, getPosts, formatDate } from "@/lib/posts";
 import { CategoryEmoji } from "@/lib/category-emoji";
+import { mdxOptions } from "@/lib/mdx-options";
 
 export async function generateStaticParams() {
   const posts = getPosts("links");
@@ -66,7 +67,7 @@ export default async function LinkPage({
       </header>
 
       <section>
-        <MDXRemote source={post.content} />
+        <MDXRemote source={post.content} options={mdxOptions} />
       </section>
     </article>
   );

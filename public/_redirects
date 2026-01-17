@@ -1,0 +1,4 @@
+/notes/:slug /posts/:slug 301
+/links/:slug /posts/:slug 301
+/notes /posts 301
+/links /posts 301

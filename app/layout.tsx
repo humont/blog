@@ -38,8 +38,7 @@ export default function RootLayout({
             aria-label="Main navigation"
           >
             <Link href="/">./home</Link>
-            <Link href="/notes">./notes</Link>
-            <Link href="/links">./links</Link>
+            <Link href="/posts">./posts</Link>
             <Link href="/rss">./rss</Link>
           </nav>
         </header>

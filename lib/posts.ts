@@ -83,17 +83,21 @@ function getMDXData(dir: string): Post[] {
   return posts;
 }
 
-export function getPosts(type: "notes" | "links"): Post[] {
-  return getMDXData(path.join(process.cwd(), "app", type, "posts"));
+export function isLink(post: Post): boolean {
+  return !!post.metadata.url;
 }
 
-export function getPost(type: "notes" | "links", slug: string): Post | undefined {
-  const posts = getPosts(type);
+export function getPosts(): Post[] {
+  return getMDXData(path.join(process.cwd(), "app", "posts", "content"));
+}
+
+export function getPost(slug: string): Post | undefined {
+  const posts = getPosts();
   return posts.find((post) => post.slug === slug);
 }
 
-export function getPostsSortedByDate(type: "notes" | "links"): Post[] {
-  return getPosts(type).sort(
+export function getPostsSortedByDate(): Post[] {
+  return getPosts().sort(
     (a, b) => new Date(b.metadata.date).getTime() - new Date(a.metadata.date).getTime()
   );
 }

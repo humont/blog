@@ -18,10 +18,8 @@ function formatRssDate(dateString: string): string {
   return date.toUTCString();
 }
 
-type PostWithType = Post & { type: 'notes' | 'links' };
-
-function generateRssItem(post: PostWithType): string {
-  const link = `${SITE_URL}/${post.type}/${post.slug}`;
+function generateRssItem(post: Post): string {
+  const link = `${SITE_URL}/posts/${post.slug}`;
   const description = post.metadata.summary || post.content.slice(0, 200) + '...';
 
   return `    <item>
@@ -33,7 +31,7 @@ function generateRssItem(post: PostWithType): string {
     </item>`;
 }
 
-function generateRssFeed(posts: PostWithType[]): string {
+function generateRssFeed(posts: Post[]): string {
   const items = posts.map(generateRssItem).join('\n');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -50,19 +48,7 @@ ${items}
 }
 
 export function GET() {
-  const notes: PostWithType[] = getPostsSortedByDate('notes').map((post) => ({
-    ...post,
-    type: 'notes',
-  }));
-
-  const links: PostWithType[] = getPostsSortedByDate('links').map((post) => ({
-    ...post,
-    type: 'links',
-  }));
-
-  const allPosts = [...notes, ...links]
-    .sort((a, b) => new Date(b.metadata.date).getTime() - new Date(a.metadata.date).getTime())
-    .slice(0, 10);
+  const allPosts = getPostsSortedByDate().slice(0, 10);
 
   const feed = generateRssFeed(allPosts);
 

@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import { getPost, getPosts, formatDate } from "@/lib/posts";
+import { getPost, getPosts, formatDate, isLink } from "@/lib/posts";
 import { CategoryEmoji } from "@/lib/category-emoji";
 import { mdxOptions } from "@/lib/mdx-options";
 
 export async function generateStaticParams() {
-  const posts = getPosts("notes");
+  const posts = getPosts();
   return posts.map((post) => ({ slug: post.slug }));
 }
 
@@ -15,25 +15,26 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = getPost("notes", slug);
+  const post = getPost(slug);
 
   if (!post) {
     return { title: "Not Found" };
   }
 
+  const prefix = isLink(post) ? "Link" : "Note";
   return {
     title: post.metadata.title,
-    description: post.metadata.summary || `Note: ${post.metadata.title}`,
+    description: post.metadata.summary || `${prefix}: ${post.metadata.title}`,
   };
 }
 
-export default async function NotePage({
+export default async function PostPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = getPost("notes", slug);
+  const post = getPost(slug);
 
   if (!post) {
     notFound();
@@ -42,7 +43,15 @@ export default async function NotePage({
   return (
     <article>
       <header>
-        <h1>{post.metadata.title}</h1>
+        <h1>
+          {post.metadata.url ? (
+            <a href={post.metadata.url} target="_blank" rel="noopener noreferrer">
+              {post.metadata.title}
+            </a>
+          ) : (
+            post.metadata.title
+          )}
+        </h1>
         <time dateTime={post.metadata.date}>
           {formatDate(post.metadata.date)}
         </time>

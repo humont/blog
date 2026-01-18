@@ -14,3 +14,5 @@ url: ''
 
 await Bun.write(filepath, frontmatter);
 console.log(`Created: ${filepath}`);
+
+export {};

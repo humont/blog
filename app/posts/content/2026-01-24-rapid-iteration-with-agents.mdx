@@ -1,0 +1,47 @@
+---
+title: 'Rapid iteration with Agents'
+date: '2026-01-24'
+category: ['AI','Dev','Thoughts']
+---
+
+I am becoming more and more convinced that Agent enabled software development rewards implementation of best practices. Before we go further, a list of best practices I'm referring to:
+
+- well defined modules with good API boundaries
+- consistent and well defined project/code patterns
+- rapid test suite
+- isolated and reproduceable development environments for features
+- rapid set up of development environment and database
+- deep tests that catch regressions (unit and integration tests are key here, with a big focus on integration especially with DB calls)
+
+There seem to be four themes in this list:
+- resilience
+- speed
+- isolation
+- reproducibility
+
+## Resilience
+Lets start with the obvious one: Tests. Many people are shouting from the rooftops that "writing code is dead". Missing in this statement is that writing tests is alive and well, in fact, it's thriving. Further, it TDD, and the "Red, Green, Refactor" approach is now a major asset in the development pipeline. Write a red test first, then unleash the agent to iterate against it until you hit green. Ask another agent to analyse the quality of that code, and refactor it.
+
+Now you have peace of mind that the code does what you think it does. Yes, this does place the onus on us, the developers, to write excellent tests that catch edge cases. Guess what, LLMs are great at analysing your test suite and critiquing it. Though I have found that LLMs are not great at writing test from scratch yet: you'll get 200 unit tests for a single function testing 199 versions of the same happy path (a slight exaggeration, but only slight).
+
+This also gives you resilience to future feature development. I've had agents wantonly go into various parts of my code base unrelated to the current feature and change functions as they see fit. When you're reviewing a merge with 50+ files touched over and over again, things slip through. No more!
+
+## Speed
+Having a development environment that is fast to set up. Being able to replicate it so an agent can work on it safely, quickly. Having a test suite that runs fast. These things take thought and time (ironically) to set up. But once they're set up, then you can let agents loose to build. Since you won't be slowed down by your set up, you're more likely to stick to the safe, happy path.
+
+If setting up a new database for an agent to develop against is slow, you're more likely to have it run against your main development database, you'll be more scared of it making a mistake and corrupting your set up, you'll be even slower, and delegate with trepidation. If things are fast, you'll be confident, and running experiments will be cheap in time.
+
+## Isolation
+If each agent runs in isolation - you can throw away or integrate it's work without fear, and with low opportunity cost. If each agent runs in isolation, it can't corrupt your environment for you or another agent. Isolation is safety, but without speed, it's not practical.
+
+## Reproducibility
+Again, closely linked to the two above - you need to be able to reproduce a clean dev environment again and again, in order to isolate it, and with speed. If your database migrations can't run cleanly from a blank slate (I've been there), then you can only have one database, with your working data, which you have to clone over and over again. You didn't write good migrations, your data structures are messy, and now you'll pay for it with slow development cycles.
+
+---
+
+## How is this different?
+A lot of this didn't use to be as important as it might be now. A sluggish, non-isolated environment is not the biggest deal if your alone on your machine. The time cost isn't that great, because you can only work so fast. But you're no longer alone on your machine. There are infinite potential agents working with you. Dropping the ball on of these parameters now has a much larger opportunity cost.
+
+Many developers have "model" projects - a scaffolding of a project they can just clone and start working with. These model projects now should include the infrastructure to nail these parameters.
+
+I'm spending a lot of time tinkering with this.

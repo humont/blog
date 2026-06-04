@@ -1,10 +1,10 @@
 ---
 title: 'Rapid iteration with Agents'
-date: '2026-01-24'
+date: '2026-07-04'
 category: ['AI','Dev','Thoughts']
 ---
 
-I am becoming more and more convinced that Agent enabled software development rewards implementation of best practices. Before we go further, a list of best practices I'm referring to:
+I am becoming more and more convinced that Agent enabled software development rewards implementation of best practices. Before we go further, a non-exhaustive list of best practices I'm referring to:
 
 - well defined modules with good API boundaries
 - consistent and well defined project/code patterns
@@ -20,9 +20,9 @@ There seem to be four themes in this list:
 - reproducibility
 
 ## Resilience
-Lets start with the obvious one: Tests. Many people are shouting from the rooftops that "writing code is dead". Missing in this statement is that writing tests is alive and well, in fact, it's thriving. Further, it TDD, and the "Red, Green, Refactor" approach is now a major asset in the development pipeline. Write a red test first, then unleash the agent to iterate against it until you hit green. Ask another agent to analyse the quality of that code, and refactor it.
+Lets start with the obvious one: Tests. Many people are shouting from the rooftops that "writing code is dead". Missing in this statement is that writing tests is alive and well, in fact, it's thriving. Furthermore, TDD, and the "Red, Green, Refactor" approach is now a major asset in the development pipeline. Write a red test first, then unleash the agent to iterate against it until you hit green. Ask another agent to analyse the quality of that code, and refactor it.
 
-Now you have peace of mind that the code does what you think it does. Yes, this does place the onus on us, the developers, to write excellent tests that catch edge cases. Guess what, LLMs are great at analysing your test suite and critiquing it. Though I have found that LLMs are not great at writing test from scratch yet: you'll get 200 unit tests for a single function testing 199 versions of the same happy path (a slight exaggeration, but only slight).
+Now you have peace of mind that the code does what you think it does. Yes, this does place the onus on us, the developers, to write excellent tests that catch edge cases. Guess what, LLMs are great at analysing your test suite and critiquing it. Though I have found that LLMs are not great at writing test from scratch yet: you'll get 200 unit tests for a single function testing 199 versions of the same happy path (a slight exaggeration, but only slight). Where I have found success is in describing user stories and generating tests from those.
 
 This also gives you resilience to future feature development. I've had agents wantonly go into various parts of my code base unrelated to the current feature and change functions as they see fit. When you're reviewing a merge with 50+ files touched over and over again, things slip through. No more!
 
@@ -40,7 +40,7 @@ Again, closely linked to the two above - you need to be able to reproduce a clea
 ---
 
 ## How is this different?
-A lot of this didn't use to be as important as it might be now. A sluggish, non-isolated environment is not the biggest deal if your alone on your machine. The time cost isn't that great, because you can only work so fast. But you're no longer alone on your machine. There are infinite potential agents working with you. Dropping the ball on of these parameters now has a much larger opportunity cost.
+A lot of this didn't use to be as important as it might be now. A sluggish, non-isolated environment is not the biggest deal if your alone on your machine. The time cost isn't that great, because you can only work so fast. But you're no longer alone on your machine. There are infinite potential agents working with you. Dropping the ball on of these parameters now has a much larger opportunity cost. Imagine onboarding someone new every minute - it would expose every barrier to "time to first commit", from understanding the codebase, bootstrapping the dev environment, trusting the dev's work, not exposing secrets. 
 
 Many developers have "model" projects - a scaffolding of a project they can just clone and start working with. These model projects now should include the infrastructure to nail these parameters.
 

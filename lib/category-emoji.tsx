@@ -18,5 +18,10 @@ interface Props {
 
 export function CategoryEmoji({ category }: Props) {
   const emoji = categoryEmojis[category];
-  return emoji ? <span aria-hidden="true">{emoji} </span> : null;
+  return emoji ? (
+    <span aria-hidden="true">
+      {emoji}
+      {"\u00a0"}
+    </span>
+  ) : null;
 }

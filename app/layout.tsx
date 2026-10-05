@@ -1,13 +1,20 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
-import './globals.css';
+import type { Metadata } from "next";
+import { JetBrains_Mono } from "next/font/google";
+import { SiteNav, SitePath } from "@/lib/site-path";
+import "./globals.css";
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "600"],
+  variable: "--font-jetbrains-mono",
+});
 
 export const metadata: Metadata = {
   title: {
-    default: 'Humont',
-    template: '%s | Humont',
+    default: "Humont",
+    template: "%s | Humont",
   },
-  description: 'Personal blog and notes',
+  description: "Personal blog and notes",
 };
 
 export default function RootLayout({
@@ -16,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={jetbrainsMono.variable}>
       <head>
         <link
           rel="alternate"
@@ -26,29 +33,19 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <header className="site-header">
-          <Link
-            href="/"
-            className="site-title"
-          >
-            ~/humont.dev
-          </Link>
-          <nav
-            className="site-nav"
-            aria-label="Main navigation"
-          >
-            <Link href="/">./home</Link>
-            <Link href="/posts">./posts</Link>
-            <Link href="/rss">./rss</Link>
-          </nav>
+        <header className="site-header" id="top">
+          <SitePath />
+          <SiteNav />
         </header>
 
         <main>{children}</main>
 
-        <footer>
-          <p>
-            <small>&copy; {new Date().getFullYear()} Humont</small>
-          </p>
+        <footer className="site-footer">
+          <p>&copy; {new Date().getFullYear()} Humont</p>
+          <nav aria-label="Footer">
+            <a href="/rss">rss</a>
+            <a href="#top">top</a>
+          </nav>
         </footer>
       </body>
     </html>

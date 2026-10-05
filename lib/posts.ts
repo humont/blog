@@ -8,15 +8,19 @@ type Metadata = {
   image?: string;
   category: string[];
   url?: string;
+  syndication: string[];
 };
 
 export type Post = {
   metadata: Metadata;
   slug: string;
   content: string;
+  bytes: number;
 };
 
-function parseFrontmatter(fileContent: string): { metadata: Metadata; content: string } | null {
+function parseFrontmatter(
+  fileContent: string,
+): { metadata: Metadata; content: string } | null {
   if (!fileContent.trim()) {
     return null;
   }
@@ -31,7 +35,7 @@ function parseFrontmatter(fileContent: string): { metadata: Metadata; content: s
   const frontMatterBlock = match[1];
   const content = fileContent.replace(frontmatterRegex, "").trim();
   const frontMatterLines = frontMatterBlock.trim().split("\n");
-  const metadata: Partial<Metadata> = { category: [] };
+  const metadata: Partial<Metadata> = { category: [], syndication: [] };
 
   for (const line of frontMatterLines) {
     const colonIndex = line.indexOf(": ");
@@ -41,11 +45,12 @@ function parseFrontmatter(fileContent: string): { metadata: Metadata; content: s
     let value = line.slice(colonIndex + 2).trim();
     value = value.replace(/^['"](.*)['"]$/, "$1");
 
-    if (key === "category") {
+    if (key === "category" || key === "syndication") {
       const arrayMatch = value.match(/^\[(.*)\]$/);
-      metadata.category = arrayMatch
-        ? arrayMatch[1].split(",").map((v) => v.trim().replace(/^['"]|['"]$/g, ""))
-        : value.split(",").map((v) => v.trim());
+      const items = arrayMatch ? arrayMatch[1].split(",") : value.split(",");
+      metadata[key] = items
+        .map((v) => v.trim().replace(/^['"]|['"]$/g, ""))
+        .filter(Boolean);
     } else {
       (metadata as Record<string, string>)[key] = value;
     }
@@ -65,7 +70,8 @@ function getMDXFiles(dir: string): string[] {
 
 function readMDXFile(filePath: string) {
   const rawContent = fs.readFileSync(filePath, "utf-8");
-  return parseFrontmatter(rawContent);
+  const parsed = parseFrontmatter(rawContent);
+  return parsed && { ...parsed, bytes: Buffer.byteLength(rawContent) };
 }
 
 function getMDXData(dir: string): Post[] {
@@ -76,7 +82,7 @@ function getMDXData(dir: string): Post[] {
     const result = readMDXFile(path.join(dir, file));
     if (result) {
       const slug = path.basename(file, path.extname(file));
-      posts.push({ metadata: result.metadata, slug, content: result.content });
+      posts.push({ slug, ...result });
     }
   }
 
@@ -85,6 +91,10 @@ function getMDXData(dir: string): Post[] {
 
 export function isLink(post: Post): boolean {
   return !!post.metadata.url;
+}
+
+export function postKind(post: Post): "note" | "link" {
+  return isLink(post) ? "link" : "note";
 }
 
 export function getPosts(): Post[] {
@@ -98,41 +108,93 @@ export function getPost(slug: string): Post | undefined {
 
 export function getPostsSortedByDate(): Post[] {
   return getPosts().sort(
-    (a, b) => new Date(b.metadata.date).getTime() - new Date(a.metadata.date).getTime()
+    (a, b) =>
+      new Date(b.metadata.date).getTime() - new Date(a.metadata.date).getTime(),
   );
 }
 
-export function formatDate(date: string, includeRelative = false): string {
-  const currentDate = new Date();
-  if (!date.includes("T")) {
-    date = `${date}T00:00:00`;
+function toDate(date: string): Date {
+  return new Date(date.includes("T") ? date : `${date}T00:00:00`);
+}
+
+export function formatDate(date: string): string {
+  return toDate(date).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+export function formatShortDate(date: string): string {
+  return toDate(date)
+    .toLocaleDateString("en-GB", { day: "numeric", month: "short" })
+    .replace(/(\w{3})\w*/, "$1");
+}
+
+export function formatListDate(date: string): string {
+  return toDate(date)
+    .toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    })
+    .replace(/(\w{3})\w*/, "$1");
+}
+
+export function getYear(date: string): number {
+  return toDate(date).getFullYear();
+}
+
+export function readingMinutes(post: Post): number {
+  const words = post.content.split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 230));
+}
+
+export function getAdjacentPosts(slug: string): { newer?: Post; older?: Post } {
+  const posts = getPostsSortedByDate();
+  const index = posts.findIndex((post) => post.slug === slug);
+  if (index === -1) return {};
+  return { newer: posts[index - 1], older: posts[index + 1] };
+}
+
+export function getCategoryCounts(
+  posts: Post[],
+): { category: string; count: number }[] {
+  const counts = new Map<string, number>();
+  for (const post of posts) {
+    for (const category of post.metadata.category) {
+      counts.set(category, (counts.get(category) ?? 0) + 1);
+    }
   }
-  const targetDate = new Date(date);
+  return [...counts.entries()]
+    .map(([category, count]) => ({ category, count }))
+    .sort((a, b) => b.count - a.count || a.category.localeCompare(b.category));
+}
 
-  const yearsAgo = currentDate.getFullYear() - targetDate.getFullYear();
-  const monthsAgo = currentDate.getMonth() - targetDate.getMonth();
-  const daysAgo = currentDate.getDate() - targetDate.getDate();
-
-  let formattedDate = "";
-
-  if (yearsAgo > 0) {
-    formattedDate = `${yearsAgo}y ago`;
-  } else if (monthsAgo > 0) {
-    formattedDate = `${monthsAgo}mo ago`;
-  } else if (daysAgo > 0) {
-    formattedDate = `${daysAgo}d ago`;
-  } else {
-    formattedDate = "Today";
+export function hostname(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
   }
+}
 
-  const year = targetDate.getFullYear();
-  const month = targetDate.toLocaleString("en-us", { month: "long" });
-  const day = targetDate.getDate();
-  const fullDate = `${year}, ${month}, ${day}`;
+export function humanSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes}B`;
+  return `${(bytes / 1024).toFixed(1)}K`;
+}
 
-  if (!includeRelative) {
-    return fullDate;
+export function sourcePath(url: string): string {
+  try {
+    const { pathname, search } = new URL(url);
+    return `${pathname}${search}`.replace(/\/$/, "");
+  } catch {
+    return "";
   }
+}
 
-  return `${fullDate} (${formattedDate})`;
+export function asProse(category: string): string {
+  return category === category.toUpperCase()
+    ? category
+    : category.toLowerCase();
 }

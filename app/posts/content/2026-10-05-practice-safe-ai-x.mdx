@@ -1,0 +1,53 @@
+---
+title: 'Practice Safe AiX:'
+date: '2026-10-06'
+category: ['AI', 'Dev']
+---
+
+I've been trying out this AI coding thing for a while now. Since the first version of Github Copilot (my brain _knows_ this wasn't that long ago, but I can't even date it - that's how long ago it feels). I've tinkered in development environments, production environments, hobby projects, professional projects... and I have thoughts, which I'm now going to add to the masses of AI writing out in the world at the moment. These are tied to my actual experiences in the field, not speculative.
+
+## Risks I've (sometimes narrowly / not) avoided
+
+### Secrets in a `.env` file
+
+It was always a bad practice, but boy was it easier to just dump it in the repo root, `.gitignore` it and carry on. Then the coding agents got access to the entire repo, could read / send it all to their benevolent servers with pinky-promises of zero-data-retention. It became a worse practice. Now our secrets are out. Don't.
+
+### Secrets in a 1Password vault
+
+This feels safer. On my latest work projects, I deploy with [kamal deploy](https://kamal-deploy.org/), and it has a handy library for inject secrets from your preferred vault. I remember the feeling of carefree delight when I stopped worrying about the LLM being able to leak my secrets. Until, that is, a coding agent ran `op item get ....` and the secret carelessly printed into it's shell. 
+
+### SSH keys kept in `.ssh/` along with a handy `.ssh/config` file
+
+I had a bug in production, which I dutifully pasted into my coding agent terminal so I could go have dinner whilst it worked away to find possible causes for the bug. Yes, obviously it tried to SSH into my production server to better understand the environment the bug occurred in.
+
+### Directory traversal, on my computer!
+
+As a kid of the 90's, I obviously typed `www.someurl.com/../` in many a website, just to be sure. Never did I think an LLM would be typing `../../` into _MY_ terminal, because it really needed to! Have I carelessly left secrets lying around in `.zshrc` and other unexpected locations on my computer? Yes... Do I have files I'd rather an Anthropic or OpenAI employee didn't have access to? Also yes...
+
+## Remedies
+
+As recently as a year ago, a lot of this would just happen in silence, and unless you read the logs of your conversations, you would have no idea anything nefarious had happened. These days, the LLM is kind enough to inform us that it has read a secret, and states you should rotate your secret. This is not very comforting given how annoying certain secrets are to rotate.
+
+Luckily, there are BETTER remedies.
+
+### A secrets vault
+
+Step 1 is to make sure there are _no_ secrets kept in plain text anywhere. That means taking your ssh keys out of your `.ssh/` directory, and not having any stray keys lying around in a `.env` file anywhere. 1Password has a handy function where it can read a `.env` file and [pass the secrets to a process](https://www.1password.dev/cli/secrets-environment-variables#step-1-map-secret-references-to-environment-variables), it also handles [ssh keys](https://www.1password.dev/ssh/agent). I'm familiar with 1Password because I use it for my family, but I'm sure there are other good options.
+
+### Constrain the agent? Not as effective as you might think
+
+As I mentioned before, despite sticking things in a vault - a persistent coding agent can still end up trying to read those secrets (If I remember correctly - OpenAI advertised Sol as being extremely persistent!). So you have to make sure the agent _cannot_ read the secret. For the two most common agents, Claude-Code and Codex, you can configure allow lists of allow/deny commands using some primitive regex-like strings.
+
+There's a problem with this - remember I mentioned that time an agent attempted to SSH into my production environment? It failed (luckily) because I already had my SSH keys in my secrets vault. At the time, however, my 1Password was set to only ask me for permission verification once every 15 minutes, had I recently granted a read access for my computer, the agent would have happily been able to SSH into that machine. As luck would have it, it got bounced by a permission prompt, but it did keep trying: after the prompt timed out, it thought it would be a good idea to try and brute force the server by trying different user/password combinations, until my fail2ban protection on the server just banned my home IP address - this was quite discomforting to come back from dinner to, though, reassuring that my safety measures held.
+
+Another issue I've observed: once the agent gets bounced multiple times from command line prompts, it attempts to write a script that contains the read commands, and execute that script instead. Persistent indeed! This opens up another flaw in the allow/deny list that agents open up: they can write scripts and execute them.
+
+### Sandboxes
+
+I've recently started experimenting with them and there's all sorts of annoying problems. The first and most obvious is that if an agent installs a malicious package in a sandbox, commits to git history, and then you run the install or run command outside your sandbox, you're compromised.
+
+On the other hand, most frontier models today don't really make such obvious mistakes. So sandboxes do make sense, since they'll protect you from a root level `rm -rf` which could blow up your machine.
+
+## Tentative conlusions
+
+It seems like the only truly safe approach is to run everything on a vm somewhere, always in isolated environments, and never on your own computer. But this sucks, it means conceding that we've completely lost control of our own compute and software. That we've given it all up to the companies building the models, and that sits wrong. So for now, I'm accepting the compromise of _some_ danger, in exchange for _some_ control.

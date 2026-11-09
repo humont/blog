@@ -1,0 +1,76 @@
+---
+title: 'A pretty nice project setup'
+date: '2026-01-27'
+category: ['Dev']
+draft: true
+---
+
+Based on my previous post on [Rapid iteration with Agents](/posts/2026-01-24-rapid-iteration-with-agents), I've been iterating through some project setups that meet the requirements of resilience, speed, isolation, and reproducibility.
+
+After a weekend of tinkering, I'm settling on a pretty nifty structure.
+
+## Architectural Assumptions
+
+This framework assumes the following stack (but obviously is reproducible with different stacks, the principles probably translate just fine):
+
+- bun.sh
+- next.js
+- prisma.js
+- postgreSQL
+
+## The Requirements in Practice
+
+The workflow I'm aiming for is as follows:
+- It should do everything locally (this is my bias, always),
+- It should allow me to work on parallel features in different git worktrees (and therefore branches),
+- It should allow each branch should get its own database to iterate against
+- It should allow for integration testing locally against the database
+- It should do all of the above with _speed_
+
+## The Tools
+
+I've gone through a few iterations of this over the years, and usually this has involved multiple docker containers. I'd create a container for my test-db, and run a full migration against it then provide some seed data. Because this was slow, I'd stick to using a single dev-db for all my branches (which historically wouldn't include worktrees at all, but LLM's have introduced me to their wonders).
+
+Today, I have a simpler, faster structure, but it involves a little more set up (the best practice tax!). The secret is using postgreSQL `TEMPLATES`, and a few small scripts to manage my set up.
+
+### Scripts
+
+The `db-template-version.ts` script creates a hash of all your current migrations - useful because we want to make sure that our `TEMPLATE` is always up to date with our latest migrations. When we run a migration, we'll also create a new template ...
+```typescript
+// db-template-version.ts
+export async function getTemplateVersionHash():Promise<string> {
+  let migrationFiles = []
+  // loop over all migration files (wherever you keep them)
+  // add file name to migrationFiles array
+  // sort them by date-created (usually in their name, so that's good enough)
+  // create a hash of all their names
+  
+  return hash
+}
+```
+
+The `db-template.ts` file actually handles generating the template and duplicating it on demand:
+```typescript
+// db-template.ts
+const PG_HOST = process.env.PG_HOST ?? "localhost";
+const PG_PORT = process.env.PG_PORT ?? "5434";
+const PG_USER = process.env.PG_USER ?? "postgres";
+const PG_PASSWORD = process.env.PG_PASSWORD ?? "postgres";
+
+const TEMPLATE_DB = "template";
+const DEV_DB = "dev";
+
+// Connection string for admin operations (connect to postgres db)
+const ADMIN_URL = `postgresql://${PG_USER}:${PG_PASSWORD}@${PG_HOST}:${PG_PORT}/postgres`;
+
+// Connection string for template operations
+const TEMPLATE_URL = `postgresql://${PG_USER}:${PG_PASSWORD}@${PG_HOST}:${PG_PORT}/${TEMPLATE_DB}`;
+
+interface TemplateStatus {
+  exists: boolean;
+  version: string | null;
+  isCurrent: boolean;
+}
+
+
+````

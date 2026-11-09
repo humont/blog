@@ -1,8 +1,8 @@
 import Link from "next/link";
 import {
   asProse,
-  formatShortDate,
   formatListDate,
+  formatShortDate,
   getCategoryCounts,
   getPostsSortedByDate,
   getYear,
@@ -106,7 +106,8 @@ export default function Page() {
             <div>
               <dt>Role</dt>
               <dd>
-                Full stack Senior Software Engineer<span className="aside">· UK</span>
+                Full stack Senior Software Engineer{" "}
+                <span className="aside">· UK</span>
               </dd>
             </div>
             <div>
@@ -155,9 +156,7 @@ export default function Page() {
             {stack.map(([key, value]) => (
               <div key={key}>
                 <dt>{key}</dt>
-                <dd>
-                  {value}
-                </dd>
+                <dd>{value}</dd>
               </div>
             ))}
             <div>

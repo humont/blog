@@ -1255,6 +1255,7 @@
     padding: 0;
 
     & li {
+      position: relative;
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       grid-template-areas: "date kind" "title title";
@@ -1281,10 +1282,21 @@
       color: var(--color-ink);
       text-decoration-color: transparent;
 
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+      }
+
       &:hover {
         color: var(--color-primary);
         text-decoration-color: currentColor;
       }
+    }
+
+    & li:hover a {
+      color: var(--color-primary);
+      text-decoration-color: currentColor;
     }
   }
 

@@ -9,6 +9,7 @@ type Metadata = {
   category: string[];
   url?: string;
   syndication: string[];
+  draft?: string;
 };
 
 export type Post = {
@@ -97,8 +98,14 @@ export function postKind(post: Post): "note" | "link" {
   return isLink(post) ? "link" : "note";
 }
 
+export function isDraft(post: Post): boolean {
+  return post.metadata.draft === "true";
+}
+
 export function getPosts(): Post[] {
-  return getMDXData(path.join(process.cwd(), "app", "posts", "content"));
+  const posts = getMDXData(path.join(process.cwd(), "app", "posts", "content"));
+  if (process.env.NODE_ENV !== "production") return posts;
+  return posts.filter((post) => !isDraft(post));
 }
 
 export function getPost(slug: string): Post | undefined {

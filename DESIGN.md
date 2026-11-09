@@ -270,7 +270,7 @@ The neofetch-style sheet. A title in `title` size: the user name pink at 600, `@
 Eight flush 2.25rem × 1.1rem rectangles under the sheet, in token order: `ink`, `ink-muted`, `ink-faint`, `hairline`, `primary`, `primary-hover`, `selection`, `code-slate`. `aria-hidden`; no labels, no gaps, no radius.
 
 ### `ls` Listing
-Recent posts as command output. A mono muted date (2-digit day, short month, year: `05 Oct 2026`), the post title in sans `list-title` (ink, pink with underline on hover), and the kind (`note` category or `link`) in muted mono. Followed by a `cd posts/` link and a muted count aside.
+Recent posts as command output. A mono muted date (2-digit day, short month, year: `05 Oct 2026`), the post title in sans `list-title` (ink, pink with underline on hover; the whole row is the link's hit area), and the kind (`note` category or `link`) in muted mono. Followed by a `cd posts/` link and a muted count aside.
 
 ### `history` Listing
 An ordered list, newest first, with no visible numbering: a pink mono when-value, and the entry as a sans sentence at 1.5 line height.
